@@ -1,0 +1,146 @@
+#%RAML 1.0
+title: x-ce-rest-location-api
+documentation: 
+  - title: Location Experience API for partners, machines, sites
+    content: |
+       Location Expereince API to be used by CE International Franchisees, which handles partners, machines, sites
+version: 1.0
+
+uses:
+  partnerLibrary: library/library-partner.raml
+
+/partner:
+  displayName: partners
+  description: partners
+  securedBy: [partnerLibrary.basicAuth]
+
+  get:
+    displayName: Get partners
+    description: Get partners
+    queryParameters:
+      _bookmark: 
+        type: string
+        required: false
+      
+      activeSiteCount: 
+        type: integer
+        required: false
+
+      partnerStatus: 
+        type: integer
+        required: false
+    
+      modCount: 
+        type: integer
+        required: false
+
+      partnerName: 
+        type: string
+        required: false
+
+      _pageSize: 
+        type: integer
+        required: false
+
+      machineCount: 
+        type: integer
+        required: false
+
+      partnerReference: 
+        type: string
+        required: false
+
+      createdDateTime: 
+        type: string
+        required: false
+
+      activeMachineCount: 
+        type: integer
+        required: false
+
+      siteCount: 
+        type: integer
+        required: false
+
+      systemPartnerId: 
+        type: string
+        required: false
+
+      serviceAgent: 
+        type: string
+        required: false
+
+      serviceAgentSource: 
+        type: string
+        required: false
+        
+      lastModifiedDateTime: 
+        type: string
+        required: false
+
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include examples/partnersResponseExample.json
+      500:
+        body:
+          application/json:
+            type: partnerLibrary.ExceptionMessage
+            examples: 
+              output: !include examples/ExceptionMessageExample.raml
+
+  /{partnerReference}:
+      uriParameters: 
+        partnerReference:
+          type: string
+
+      get:
+        description: get partner by partnerReference
+        displayName: get partner by partnerReference
+
+        responses:
+          200:
+            body:
+              application/json:
+                type: partnerLibrary.ExceptionMessage
+                examples: 
+                  output: !include examples/ExceptionMessageExample.raml
+          404:
+            body:
+              application/json:
+                type: partnerLibrary.ExceptionMessage
+                examples: 
+                  output: !include examples/ExceptionMessageExample.raml
+          500:
+            body:
+              application/json:
+                type: partnerLibrary.ExceptionMessage
+                examples: 
+                  output: !include examples/ExceptionMessageExample.raml
+
+  post:
+    displayName: Create a partner
+    description: Create a partner
+    body:
+      application/json:
+        type: partnerLibrary.CreatePartner
+        example: !include examples/createPartnerExample.json
+    responses:
+      200:
+        body:
+          application/json:
+            type: !include datatypes/partnerResponse.raml
+         
+  put:
+    displayName: Update a partner
+    description: Update a partner
+    body:
+      application/json:
+        type: partnerLibrary.UpdatePartner
+        example: !include examples/updatePartnerExample.json
+    responses:
+      200:
+        body:
+          application/json:
+            type: !include datatypes/partnerResponse.raml

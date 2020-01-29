@@ -1,0 +1,14 @@
+{
+  "systemPartnerId": "00001",
+  "partnerReference": "AC10045",
+  "name": "MyPartner - MyPartner Retail Ltd",
+  "serviceAgent": "COSTAEXPRESS",
+  "serviceAgentSource": "PARTNER",
+  "siteCount": 3,
+  "activeSiteCount": 3,
+  "machineCount": 4,
+  "activeMachineCount": 4,
+  "createdDateTime": "2019-04-21T23:22:04.34",
+  "modCount": 0,
+  "lastModifiedDateTime": "2019-04-21T23:22:04.34"
+}

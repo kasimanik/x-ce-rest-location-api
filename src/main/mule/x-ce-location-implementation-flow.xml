@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration_partners" doc:name="HTTP Request configuration" doc:id="20187356-03b1-43b2-b142-4a1523f2fb80" >
+		<http:request-connection host="${s-ce-partner-us-host}" port="${s-ce-partner-us-port}" />
+	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="74f979a5-80f8-41ae-aa85-efe1e3c1cefe" file="x-ce-rest-location-api-local.properties" />
+	<flow name="x-ce-partners-get-partners-flow" doc:id="5da8b2db-5786-45bb-b781-501e02ca7e8d" >
+		<flow-ref doc:name="entry-logger-flow" doc:id="cb1be4ad-8ce3-4340-b4a5-2e8e412011e2" name="entry-logger-flow" />
+		<flow-ref doc:name="call-entry-audit-flow" doc:id="7f2a8287-c807-4d92-b154-69e1f62d7a11" name="call-entry-audit-flow"/>
+		<http:request method="GET" doc:name="Get Partners" doc:id="ff91be04-bfc6-4ee7-9902-41c78fa63d3c" config-ref="HTTP_Request_configuration_partners" path="${s-ce-partner-us-api.partners.path}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	franchise : p('ce-partner-franchise-id'),
+	client_secret : p('ce-partner-us-client-secret'),
+	client_id : p('ce-partner-us-client-id')
+}]]]></http:headers>
+		</http:request>
+		<flow-ref doc:name="exit-logger-flow" doc:id="acca806c-df5e-47e5-b404-4c28bf2c7f90" name="exit-logger-flow" />
+		<flow-ref doc:name="call-exit-audit-flow" doc:id="5b129438-e756-4d3d-a070-3d83ce280a86" name="call-exit-audit-flow" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7c80d5dd-5d6b-4662-854a-bb59d90f2a30" >
+				<flow-ref doc:name="error-logger-flow" doc:id="6e7f0461-2b7b-4ef6-97eb-e56148a4076b" name="error-logger-flow"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="x-ce-partners-get-partners-partnerReference-flow" doc:id="396ad5a5-cb6f-4045-8051-d9aa67d8b2e6" >
+		<flow-ref doc:name="entry-logger-flow" doc:id="335b3f0a-51c3-4d23-b740-313aa1cc20f3" name="entry-logger-flow"/>
+		<flow-ref doc:name="call-entry-audit-flow" doc:id="8b6a5307-0900-4322-bac1-d963e88e4ac1" name="call-entry-audit-flow"/>
+		<http:request method="GET" doc:name="Get Partners PartnerReference" doc:id="9bfe3c92-6e8f-4b98-8c33-6b2a899b5c3e" config-ref="HTTP_Request_configuration_partners" path="${s-ce-partner-us-api.partners.path}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	franchise : p('ce-partner-franchise-id'),
+	client_secret : p('ce-partner-us-client-secret'),
+	client_id : p('ce-partner-us-client-id')
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"partnerReference" : "# [attributes.uriParams.partnerReference]"
+}]]]></http:uri-params>
+		
+</http:request>
+		<flow-ref doc:name="exit-logger-flow" doc:id="0643103d-725d-4d5e-9583-d81497f9c45c" name="exit-logger-flow" />
+		<flow-ref doc:name="call-exit-audit-flow" doc:id="0eff8ae9-fb54-49df-906f-e8c385162952" name="call-exit-audit-flow"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c500e6e0-f263-4b49-8bbc-e1becfbf8171" >
+				<flow-ref doc:name="entry-logger-flow" doc:id="840bfe91-5c50-49b0-9622-cd02ea2bc343" name="entry-logger-flow"/>
+			</on-error-continue>
+		</error-handler>
+	
+</flow>
+	<flow name="x-ce-location-put-partner-flow">
+	<flow-ref doc:name="entry-logger-flow" doc:id="ff4a20da-d576-4eda-9c3d-9978aa5997af" name="entry-logger-flow"/>
+		<flow-ref doc:name="call-entry-audit-flow" doc:id="f4f7f9d9-f65e-4266-a4a2-594ae9991d03" name="call-entry-audit-flow"/>
+		<http:request method="PUT" doc:name="Put Partners" doc:id="379caf5a-d630-4327-832d-9833d1ff003f" config-ref="HTTP_Request_configuration_partners" path="${s-ce-partner-us-api.partners.path}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	franchise : p('ce-partner-franchise-id'),
+	client_secret : p('ce-partner-us-client-secret'),
+	client_id : p('ce-partner-us-client-id')
+}]]]></http:headers>
+		</http:request>
+		<flow-ref doc:name="exit-logger-flow" doc:id="5553a24f-9a96-4400-a939-94842d3b3412" name="exit-logger-flow"/>
+		<flow-ref doc:name="call-exit-audit-flow" doc:id="39253066-1c8e-481e-8a19-4736262feea6" name="call-exit-audit-flow"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5e617b46-d45d-4485-a652-2aca35fe46bb" >
+				<flow-ref doc:name="error-logger-flow" doc:id="fc03bd32-c551-4332-a707-d86a43b9dee7" name="error-logger-flow" />
+			</on-error-continue>
+		</error-handler>
+	
+</flow>
+	<flow name="x-ce-location-post-partners-flow">
+	<flow-ref doc:name="entry-logger-flow" doc:id="e9ba8e1a-1aee-4c78-99bc-9bf2c585eb05" name="entry-logger-flow"/>
+		<flow-ref doc:name="call-entry-audit-flow" doc:id="377e3167-a8dc-4677-963d-e76f138c2fe2" name="call-entry-audit-flow"/>
+		<http:request method="POST" doc:name="Post Partners" doc:id="6753328b-af01-4d36-8f1a-fbfaa2a26dee" config-ref="HTTP_Request_configuration_partners" path="${s-ce-partner-us-api.partners.path}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	franchise : p('ce-partner-franchise-id'),
+	client_secret : p('ce-partner-us-client-secret'),
+	client_id : p('ce-partner-us-client-id')
+}]]]></http:headers>
+		</http:request>
+		<flow-ref doc:name="exit-logger-flow" doc:id="d0b5cb4c-5664-4b13-a5b3-7433e46ee4b8" name="exit-logger-flow"/>
+		<flow-ref doc:name="call-exit-audit-flow" doc:id="57f49214-0506-4333-a541-f7ea87fdda94" name="call-exit-audit-flow"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c2f68140-f809-4f4e-bfc3-8166d439b25a" >
+				<flow-ref doc:name="error-logger-flow" doc:id="c2860dd9-a8a3-4b45-8d88-d57a07810ab5" name="error-logger-flow"/>
+			</on-error-continue>
+		</error-handler>
+	
+</flow>
+</mule>

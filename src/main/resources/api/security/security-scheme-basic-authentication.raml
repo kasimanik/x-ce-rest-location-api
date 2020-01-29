@@ -1,0 +1,10 @@
+#%RAML 1.0 SecurityScheme
+type: Basic Authentication
+description: Basic Authentication Scheme
+describedBy:
+  headers:
+    Authorization:
+      description: |
+        Base64 encoded "username:password credentials
+      type: string
+

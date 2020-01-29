@@ -1,0 +1,24 @@
+{
+  "header": {
+    "count": 1,
+    "prev": "https://cs-locationapi-prod-v1.ir-e1.cloudhub.io/partner?_page_size=1&_bookmark=-000000002",
+    "next": "https://cs-locationapi-prod-v1.ir-e1.cloudhub.io/partner?_page_size=1&_bookmark=+00000002"
+  },
+  "records": [
+    {
+      "systemPartnerId": "00001",
+      "partnerReference": "AC10045",
+      "name": "MyPartner - MyPartner Retail Ltd",
+      "serviceAgent": "COSTAEXPRESS",
+      "serviceAgentSource": "PARTNER",
+      "siteCount": 3,
+      "activeSiteCount": 3,
+      "machineCount": 4,
+      "activeMachineCount": 4,
+      "createdDateTime": "2019-04-21T23:22:04.34",
+      "modCount": 0,
+      "lastModifiedDateTime": "2019-04-21T23:22:04.34"
+    }
+  ]
+}
+

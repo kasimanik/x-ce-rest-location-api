@@ -1,0 +1,18 @@
+#%RAML 1.0 Library
+
+types: 
+  CreatePartner: !include ..//datatypes/createPartner.raml
+  UpdatePartner: !include ..//datatypes/updatePartner.raml
+  ExceptionMessage: !include ../datatypes/ExceptionMessage.raml
+  ResponseHeaders: !include ..//datatypes/responseHeaders.raml
+  GetPartner: !include ..//datatypes/partnerResponse.raml
+
+securitySchemes:
+  # This is not fully supported.
+  clientIdHeader: !include ../security/security-scheme-client-id-header.raml
+  basicAuth: !include ../security/security-scheme-basic-authentication.raml
+  
+traits: 
+  # Us this for client ID validation instead of clientIdHeader security scheme
+  clientIdHeader: !include ../traits/trait-client-id-header.raml
+  basicAuthHeader: !include ../traits/trait-basic-auth-header.raml

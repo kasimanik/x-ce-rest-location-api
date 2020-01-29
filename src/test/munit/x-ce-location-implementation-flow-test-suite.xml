@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="x-ce-location-implementation-flow-test-suite.xml" />
+	<munit:test name="x-ce-location-implementation-flow-test-suite-x-ce-partners-get-partners-success-flowTest" doc:id="5b4473f5-30a7-42ab-b0fa-ce71803b6984" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Get Partners Mock" doc:id="facc7523-d9e0-4fff-9f04-632ade1cefb1" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to x-ce-partners-get-partners-flow" doc:id="536a338f-2a3c-4052-bd18-57e2ef1f7bb1" name="x-ce-partners-get-partners-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call to Get Partners" doc:id="4d925099-bb57-4a1b-9984-af9076cf4173" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="x-ce-location-implementation-flow-test-suite-x-ce-partners-get-partners-failure-flowTest" doc:id="2b18456f-6bf4-406e-89c6-fb35ca3884bc" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Get Partners Mock" doc:id="833a014e-2130-4232-b560-afc8b5646944" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:BAD_REQUEST" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to x-ce-partners-get-partners-flow" doc:id="24858086-c0fd-491a-bf84-632d2b5755e5" name="x-ce-partners-get-partners-flow"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="x-ce-location-implementation-flow-test-suite-x-ce-partners-get-partners-partnerReference-Success-flowTest" doc:id="871f5166-91df-46eb-ad04-973fda88b04f" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Get Partners-Pertner Reference Mock API" doc:id="70e0b8fa-37ec-4620-b38b-3baa40d4f2e1" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners PartnerReference" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners PartnerReference" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to x-ce-partners-get-partners-partnerReference-flow" doc:id="719df39d-6489-44c6-8692-8340d5f9c101" name="x-ce-partners-get-partners-partnerReference-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call to Get Partners-Pertner Reference" doc:id="a3b6b7f9-da30-4c05-874d-bff3267b5889" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners PartnerReference" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners PartnerReference" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+<munit:test name="x-ce-location-implementation-flow-test-suite-x-ce-partners-get-partners-partnerReference-Failure-flowTest"  description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Get Partners-Pertner Reference Mock" doc:id="d1def918-3c96-4148-bcc9-27f2850b2955" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners PartnerReference" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Get Partners PartnerReference" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:BAD_REQUEST" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to x-ce-partners-get-partners-partnerReference-flow" doc:id="3c218c8e-5808-41d5-9154-8c7c75cedc3b" name="x-ce-partners-get-partners-partnerReference-flow"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="x-ce-location-implementation-flow-test-suite-x-ce-location-put-partner-Success-flowTest" doc:id="735647db-436e-4843-bb77-35296c2f839b" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="PUT Parteners Mock" doc:id="25385c65-d239-4a2e-9014-7bddad1fb17c" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="PUT" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Put Partners" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="PUT" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Put Partners" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to x-ce-location-put-partner-flow" doc:id="003dd439-341a-415d-82bf-aceda991e19a" name="x-ce-location-put-partner-flow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call to PUT Partners" doc:id="5c4fcf86-9c1f-419a-925f-0fc78edc4aa4" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="PUT" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Put Partners" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="PUT" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Put Partners" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="x-ce-location-implementation-flow-test-suite-x-ce-location-put-partner-Failure-flowTest" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="PUT Partners Mock" doc:id="25a75d51-818f-4b17-a689-1726382d60c3" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="PUT" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Put Partners" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="PUT" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Put Partners" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:BAD_REQUEST" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to x-ce-location-put-partner-flow" doc:id="24406aaa-4154-4f73-98df-5b1774c75011" name="x-ce-location-put-partner-flow"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="x-ce-location-implementation-flow-test-suite-x-ce-location-post-partners-Success-flowTest" doc:id="47ebf75f-f876-4daf-80a5-ef1e266d6250" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Post Partners Mock" doc:id="72475720-5b75-47aa-86b8-0150601ede52" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="POST" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Post Partners" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="POST" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Post Partners" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to x-ce-location-post-partners-flow" doc:id="a39d96a1-9cbf-453a-be43-6d3b04f79128" name="x-ce-location-post-partners-flow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:verify-call doc:name="Verify call Post Partners" doc:id="5d134334-ca5e-4f75-86e2-12b03d49885c" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="POST" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Post Partners" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="POST" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Post Partners" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+<munit:test name="x-ce-location-implementation-flow-test-suite-x-ce-location-post-partners-Failure-flowTest" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Post Partners Mock" doc:id="bee7fd25-ff09-453e-b295-211907e24613" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="POST" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Post Partners" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="POST" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Post Partners" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to x-ce-location-post-partners-flow" doc:id="05af4963-3e5c-4b23-a1b8-ee7482036a2e" name="x-ce-location-post-partners-flow"/>
+		</munit:execution>
+	</munit:test>
+
+
+</mule>
