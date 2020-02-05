@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:cluster="http://www.mulesoft.org/schema/mule/ee/cluster" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<configuration doc:name="Configuration" doc:id="cab67095-fba4-48a5-b3cd-a340025ae5aa" defaultErrorHandler-ref="x-ce-global-error-handlerError_Handler" >
+		
+	</configuration>
+	<error-handler name="x-ce-global-error-handlerError_Handler" doc:id="16e5a68d-2e3b-4f91-8672-02651278306e" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ab5dd2c1-8a3a-4925-8a17-47790ccfa2d0" type="VALIDATION:NULL">
+			<set-variable value="#[403]" doc:name="Set Variable" doc:id="b5494055-d690-48bd-97b0-cffe1054e8c9" variableName="httpStatus"/>
+			<ee:transform doc:name="Transform Message" doc:id="6af7c869-c7ea-4026-bae9-f734175845bf">
+				<ee:message>
+					<ee:set-payload resource="400_Exception.dwl" />
+				</ee:message>
+				<ee:variables >
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="x-ce-partner-flow-common-error-logging" doc:id="baa5e611-6db9-4662-b31c-c32bd3411f0f" name="x-ce-partner-flow-common-error-logging"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="21194f37-5ec7-4a37-ad88-285ffdc07f1c" type="ANY">
+			<ee:transform doc:name="Transform Message" doc:id="e56c04c1-a6cd-428f-b54b-946914226d21" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<ee:transform doc:name="Transform Message" doc:id="7f7b55a8-daec-4e1d-9a3e-4c7f67298b74">
+				<ee:message>
+					<ee:set-payload resource="500_Exception.dwl" />
+				</ee:message>
+				<ee:variables>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="x-ce-partner-flow-common-error-logging" doc:id="7bc7e6ca-cdcc-429c-ac25-61c420cd4f7b" name="x-ce-partner-flow-common-error-logging"/>
+		</on-error-propagate>
+
+	
+	</error-handler>
+	
+ <error-handler name="apiKitGlobalExceptionMapping">
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <set-variable value="400" doc:name="Set Variable" doc:id="d52f1139-54f9-4676-b25d-311673b457ea" variableName="httpStatus"/>
+				<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="f1cf17d0-141d-4a4a-a0e0-4e2c65037834">
+                    <ee:message>
+                    </ee:message>
+                    <ee:variables>
+						<ee:set-variable variableName="badRequest" ><![CDATA[p('bad.request')]]></ee:set-variable>
+						<ee:set-variable variableName="http400Code" ><![CDATA[p('400')]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+				<flow-ref doc:name="global-bad-request-response-sub-flow" doc:id="9fc0add3-573f-46a7-b9e6-fcb2e7a6bbaa" name="global-bad-request-response-sub-flow"/>
+			<flow-ref doc:name="x-ce-partner-flow-common-error-logging" doc:id="61923a48-82a7-44b0-832b-09422edf5e57" name="x-ce-partner-flow-common-error-logging"/>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+				<set-variable value="404" doc:name="Set HTTP Status" doc:id="21adcaab-6f55-4ba8-a4ee-088d5ea61386" variableName="httpStatus"/>
+				<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="8ae3ac2e-418a-4849-81ce-b71804c47694">
+                    <ee:message>
+                    </ee:message>
+                    <ee:variables>
+						<ee:set-variable variableName="http405Code" ><![CDATA[p('405')]]></ee:set-variable>
+						<ee:set-variable variableName="resourceNotFound" ><![CDATA[p('resource.not.found')]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+				<flow-ref doc:name="global-resource-not-found-response-sub-flow" doc:id="8ba15453-d923-4d86-954b-f228bb511738" name="global-resource-not-found-response-sub-flow"/>
+			<flow-ref doc:name="x-ce-partner-flow-common-error-logging" doc:id="82e0bd08-b5bc-4a48-9dea-8da84be8b145" name="x-ce-partner-flow-common-error-logging"/>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <set-variable value="405" doc:name="Set HTTP Status" doc:id="016e999e-f244-4dc4-8d20-f8d753695460" variableName="httpStatus"/>
+				<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="a01eccef-1a24-42de-8c9a-b6f6752540a5">
+                    <ee:message>
+                    </ee:message>
+                    <ee:variables>
+						<ee:set-variable variableName="menthodNotAllowed" ><![CDATA[p('method.not.allowed')]]></ee:set-variable>
+						<ee:set-variable variableName="http405Code" ><![CDATA[p('405')]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+				<flow-ref doc:name="global-resource-not-found-response-sub-flow" doc:id="05044f31-3723-4569-9d8c-cc95294d2e87" name="global-resource-not-found-response-sub-flow"/>
+			<flow-ref doc:name="x-ce-partner-flow-common-error-logging" doc:id="d6f98b04-534f-4991-8392-833b69ed90b6" name="x-ce-partner-flow-common-error-logging"/>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <set-variable value="406" doc:name="Set HTTP Status" doc:id="318eb6ee-856d-4284-951c-891a92f0b586" variableName="httpStatus"/>
+				<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="ec1725e6-297a-4d45-a9fe-478d37ba3d3e">
+                    <ee:message>
+                    </ee:message>
+                    <ee:variables>
+						<ee:set-variable variableName="http406Code" ><![CDATA[p('406')]]></ee:set-variable>
+						<ee:set-variable variableName="notAcceptable" ><![CDATA[p('not.acceptable')]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+				<flow-ref doc:name="global-resource-not-found-response-sub-flow" doc:id="4aa761da-e144-4060-b6c4-6a248e2eee5c" name="global-resource-not-found-response-sub-flow"/>
+			<flow-ref doc:name="x-ce-partner-flow-common-error-logging" doc:id="9558282e-de49-41a8-bea1-870a59a2d4eb" name="x-ce-partner-flow-common-error-logging"/>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <set-variable value="415" doc:name="Set HTTP Status" doc:id="0f5bdb8f-2d2a-4c42-97ec-055d3e0304b6" variableName="httpStatus"/>
+				<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="fd16858e-945c-4986-872c-081eb6467d7f">
+                    <ee:message>
+                    </ee:message>
+                    <ee:variables>
+						<ee:set-variable variableName="badMediaType" ><![CDATA[p('bad.media.type')]]></ee:set-variable>
+						<ee:set-variable variableName="http415Code" ><![CDATA[p('415')]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+				<flow-ref doc:name="global-resource-not-found-response-sub-flow" doc:id="434ee45c-07f0-4035-a2bc-c5c40b1a135f" name="global-resource-not-found-response-sub-flow"/>
+			<flow-ref doc:name="x-ce-partner-flow-common-error-logging" doc:id="5ec2fc5f-cc38-43ee-82fe-5cdd6d51b92f" name="x-ce-partner-flow-common-error-logging"/>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <set-variable value="502" doc:name="Set HTTP Status" doc:id="d481036b-0a7e-49f0-a17e-1d6e329bc957" variableName="httpStatus"/>
+				<ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="eb7e08f7-d8fc-4d04-8a72-c94921070655">
+                    <ee:message>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
+						<ee:set-variable variableName="http502Code" ><![CDATA[p('502')]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+				<flow-ref doc:name="global-resource-not-found-response-sub-flow" doc:id="2149124b-5eb2-4209-b14a-9b5d477481de" name="global-resource-not-found-response-sub-flow"/>
+			<flow-ref doc:name="x-ce-partner-flow-common-error-logging" doc:id="f00ae436-dd66-4239-877e-865ca11512dc" name="x-ce-partner-flow-common-error-logging"/>
+            
+</on-error-propagate>
+        </error-handler>	
+</mule>

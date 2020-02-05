@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<api-gateway:autodiscovery apiId="${gateway.apiId}" doc:name="API Autodiscovery" doc:id="5ff5960b-64a3-4594-a831-df6af8a298bb" flowRef="x-ce-rest-location-api-main" />
+	<http:request-config name="HTTP_Request_configuration_partners" doc:name="HTTP Request configuration" doc:id="5f8bf096-4be8-4433-94f7-c072c93352ef" basePath="/${s-ce-partner-us-basePath}">
+		<http:request-connection host="${s-ce-partner-us-host}" port="${s-ce-partner-us-port}" protocol="HTTPS"/>
+	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="13aa9305-5d54-4d2a-9178-b67585df210e" file="properties\x-ce-rest-location-api-local.properties" />
+	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="3b391c2b-2c16-48fe-9c0e-8b36cc5eddf2" />
+	<import doc:name="Import" doc:id="c0a8d0c4-6f8f-47ea-b209-ad693f06af25" file="common-logging.xml" />
+	<import doc:name="Import" doc:id="16cb0755-b387-44ff-8db0-ad0aeb513dbd" file="common-error-handling.xml" />
+</mule>

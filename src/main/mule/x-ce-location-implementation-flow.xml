@@ -1,101 +1,182 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-	<http:request-config name="HTTP_Request_configuration_partners" doc:name="HTTP Request configuration" doc:id="20187356-03b1-43b2-b142-4a1523f2fb80" >
-		<http:request-connection host="${s-ce-partner-us-host}" port="${s-ce-partner-us-port}" />
-	</http:request-config>
-	<configuration-properties doc:name="Configuration properties" doc:id="74f979a5-80f8-41ae-aa85-efe1e3c1cefe" file="x-ce-rest-location-api-local.properties" />
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
 	<flow name="x-ce-partners-get-partners-flow" doc:id="5da8b2db-5786-45bb-b781-501e02ca7e8d" >
-		<flow-ref doc:name="entry-logger-flow" doc:id="cb1be4ad-8ce3-4340-b4a5-2e8e412011e2" name="entry-logger-flow" />
-		<flow-ref doc:name="call-entry-audit-flow" doc:id="7f2a8287-c807-4d92-b154-69e1f62d7a11" name="call-entry-audit-flow"/>
-		<http:request method="GET" doc:name="Get Partners" doc:id="ff91be04-bfc6-4ee7-9902-41c78fa63d3c" config-ref="HTTP_Request_configuration_partners" path="${s-ce-partner-us-api.partners.path}">
+		<flow-ref doc:name="x-ce-partner-flow-common-entry-logging" doc:id="bb53e4ad-ed4b-4d2f-b59e-6ef638a3498f" name="x-ce-partner-flow-common-entry-logging"/>
+		<ee:transform doc:name="Check Franchise Header and Generate Trans_Id &amp; Request_Id" doc:id="c65ec011-05b7-422d-927e-f09bac311bcb" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable resource="FranchiseId.dwl" variableName="franchise" />
+				<ee:set-variable resource="REQ_ID&amp;TRANS_ID.dwl" variableName="vRequestId" />
+				<ee:set-variable resource="REQ_ID&amp;TRANS_ID.dwl" variableName="vTransactionId" />
+				<ee:set-variable variableName="pageSize" ><![CDATA[%dw 2.0
+output application/java
+
+
+---
+ attributes.header.queryParam.'_page_size']]></ee:set-variable>
+				<ee:set-variable variableName="bookMark" ><![CDATA[%dw 2.0
+output application/java
+
+
+---
+attributes.header.queryParam.'_bookmark'
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<validation:is-not-null doc:name="Franchise Not null" doc:id="79dd1ff3-5d63-4f11-9a25-96c433444fe9" value="#[vars.franchise]" message="Invalid franchise"/>
+		<http:request method="GET" doc:name="Get Partners" doc:id="ff91be04-bfc6-4ee7-9902-41c78fa63d3c" path="${s-ce-partner-us-api.partners.path}" sendCorrelationId="ALWAYS" config-ref="HTTP_Request_configuration_partners">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
-	franchise : p('ce-partner-franchise-id'),
-	client_secret : p('ce-partner-us-client-secret'),
-	client_id : p('ce-partner-us-client-id')
+	"X-COSTA-TRANSACTION-ID" : vars.TransactionId,
+	"X-COSTA-REQUEST-ID" : vars.RequestId
 }]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java SkipNullOn="everywhere"
+---
+{
+	franchise : vars.franchiseId,
+	"_bookmark": attributes.queryParams.'_bookmark',
+	"_pageSize": attributes.queryParams.'_pageSize',
+	serviceAgent: attributes.queryParams.serviceAgent,
+	partnerStatus: attributes.queryParams.partnerStatus,
+	partnerName: attributes.queryParams.partnerName,
+	partnerReference: attributes.queryParams.partnerReference,
+	createdDateTime: attributes.queryParams.createdDateTime,
+	systemPartnerId: attributes.queryParams.systemPartnerId,
+	serviceAgentSource: attributes.queryParams.serviceAgentSource,
+	lastModifiedDateTime: attributes.queryParams.lastModifiedDateTime
+}]]]></http:query-params>
 		</http:request>
-		<flow-ref doc:name="exit-logger-flow" doc:id="acca806c-df5e-47e5-b404-4c28bf2c7f90" name="exit-logger-flow" />
-		<logger level="INFO" doc:name="Logger" doc:id="94b511de-f56b-43d4-bb4c-eb2008b98b8e" message="added logger for testing purppose"/>
-		<flow-ref doc:name="call-exit-audit-flow" doc:id="5b129438-e756-4d3d-a070-3d83ce280a86" name="call-exit-audit-flow" />
-		<error-handler >
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7c80d5dd-5d6b-4662-854a-bb59d90f2a30" >
-				<flow-ref doc:name="error-logger-flow" doc:id="6e7f0461-2b7b-4ef6-97eb-e56148a4076b" name="error-logger-flow"/>
-			</on-error-continue>
-		</error-handler>
+		<ee:transform doc:name="PageSize &amp; Bookmark Mapping" doc:id="6e4788d5-59ac-43b8-a6c5-f68933122d2a" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable resource="nextBookMark.dwl" variableName="nextBookMark" />
+				<ee:set-variable resource="prevBookMark.dwl" variableName="prevBookMark" />
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Response Mapping" doc:id="43fbbaf9-ba17-4b7e-abfc-d545b204c4a4" >
+			<ee:message >
+				<ee:set-payload resource="GetPartnerResponsePayload.dwl" />
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="x-ce-partner-flow-common-exit-logging" doc:id="f37754dd-92e3-4c06-b734-f8cacfbae700" name="x-ce-partner-flow-common-exit-logging"/>
 	</flow>
-	<flow name="x-ce-partners-get-partners-partnerReference-flow" doc:id="396ad5a5-cb6f-4045-8051-d9aa67d8b2e6" >
-		<flow-ref doc:name="entry-logger-flow" doc:id="335b3f0a-51c3-4d23-b740-313aa1cc20f3" name="entry-logger-flow"/>
-		<flow-ref doc:name="call-entry-audit-flow" doc:id="8b6a5307-0900-4322-bac1-d963e88e4ac1" name="call-entry-audit-flow"/>
-		<http:request method="GET" doc:name="Get Partners PartnerReference" doc:id="9bfe3c92-6e8f-4b98-8c33-6b2a899b5c3e" config-ref="HTTP_Request_configuration_partners" path="${s-ce-partner-us-api.partners.path}">
+	<flow name="x-ce-partners-get-partners-partnerReference-flow" doc:id="9c8e14ce-c353-418b-a450-cd7895981433" >
+		<flow-ref doc:name="x-ce-partner-flow-common-entry-logging" doc:id="abfa0764-71c6-4766-9b40-61f2076a494e" name="x-ce-partner-flow-common-entry-logging"/>
+		<ee:transform doc:name="Check Franchise Header and Generate Trans_Id &amp; Request_Id" doc:id="ea904e09-964b-4adf-8c53-27ebc182cc88" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable resource="FranchiseId.dwl" variableName="franchise" />
+				<ee:set-variable resource="REQ_ID&amp;TRANS_ID.dwl" variableName="vRequestId" />
+				<ee:set-variable resource="REQ_ID&amp;TRANS_ID.dwl" variableName="vTransactionId" />
+			</ee:variables>
+		</ee:transform>
+		<validation:is-not-null doc:name="Franchise Not null" doc:id="071f2f84-9bdc-4468-af53-63aee1ca613c" value="#[vars.franchise]" message="Invalid franchise"/>
+		<http:request method="GET" doc:name="Get PartnerReference" doc:id="163208f8-912c-4292-b823-e926d769f9fe" path="${s-ce-partner-us-api.partner.reference.path}" config-ref="HTTP_Request_configuration_partners">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
-	franchise : p('ce-partner-franchise-id'),
-	client_secret : p('ce-partner-us-client-secret'),
-	client_id : p('ce-partner-us-client-id')
+	"X-COSTA-TRANSACTION-ID" : vars.TransactionId,
+	"X-COSTA-REQUEST-ID" : vars.RequestId
 }]]]></http:headers>
 			<http:uri-params ><![CDATA[#[output application/java
 ---
 {
-	"partnerReference" : "# [attributes.uriParams.partnerReference]"
+	"partnerReference" : attributes.uriParams.partnerReference
 }]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Response Payload" doc:id="10e77283-54e7-4eff-a7f9-87f8383dc9b8" >
+			<ee:message >
+				<ee:set-payload resource="Response_Payload.dwl" />
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="x-ce-partner-flow-common-exit-logging" doc:id="2c7ce20e-e69d-43bc-b3f1-a233a398fabd" name="x-ce-partner-flow-common-exit-logging"/>
+	</flow>
+	<flow name="x-ce-location-put-partner-flow">		
+			<flow-ref doc:name="x-ce-partner-flow-common-entry-logging" doc:id="98da385d-0e95-49e4-84bc-b296149af841" name="x-ce-partner-flow-common-entry-logging"/>
+		<ee:transform doc:name="Check Franchise Header and Generate Trans_Id &amp; Request_Id" doc:id="6f5cf41e-c32a-4a34-b6b0-d0714dbe2b51" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable resource="REQ_ID&amp;TRANS_ID.dwl" variableName="vTransactionId" />
+				<ee:set-variable resource="REQ_ID&amp;TRANS_ID.dwl" variableName="vRequestId" />
+				<ee:set-variable resource="FranchiseId.dwl" variableName="franchise" />
+			</ee:variables>
+		</ee:transform>
+		<validation:is-not-null doc:name="Franchise Not Null" doc:id="0b941581-fbd1-4c5e-80a1-95868c8b9fef" value="#[vars.franchise]" message="Invalid franchise"/>
+		<ee:transform doc:name="Request_Payload" doc:id="43fd5f8c-4009-4464-a328-8ad7caea62ce" >
+			<ee:message >
+				<ee:set-payload resource="Update_Partner_Request.dwl" />
+			</ee:message>
+		</ee:transform>
+		<http:request method="PUT" doc:name="Update Partners" path="${s-ce-partner-us-api.partners.path}" config-ref="HTTP_Request_configuration_partners">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"X-COSTA-TRANSACTION-ID" : vars.TransactionId,
+	"X-COSTA-REQUEST-ID" : vars.RequestId
+}]]]></http:headers>
 		
-</http:request>
-		<flow-ref doc:name="exit-logger-flow" doc:id="0643103d-725d-4d5e-9583-d81497f9c45c" name="exit-logger-flow" />
-		<flow-ref doc:name="call-exit-audit-flow" doc:id="0eff8ae9-fb54-49df-906f-e8c385162952" name="call-exit-audit-flow"/>
-		<error-handler >
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c500e6e0-f263-4b49-8bbc-e1becfbf8171" >
-				<flow-ref doc:name="entry-logger-flow" doc:id="840bfe91-5c50-49b0-9622-cd02ea2bc343" name="entry-logger-flow"/>
-			</on-error-continue>
-		</error-handler>
-	
-</flow>
-	<flow name="x-ce-location-put-partner-flow">
-	<flow-ref doc:name="entry-logger-flow" doc:id="ff4a20da-d576-4eda-9c3d-9978aa5997af" name="entry-logger-flow"/>
-		<flow-ref doc:name="call-entry-audit-flow" doc:id="f4f7f9d9-f65e-4266-a4a2-594ae9991d03" name="call-entry-audit-flow"/>
-		<http:request method="PUT" doc:name="Put Partners" doc:id="379caf5a-d630-4327-832d-9833d1ff003f" config-ref="HTTP_Request_configuration_partners" path="${s-ce-partner-us-api.partners.path}">
-			<http:headers ><![CDATA[#[output application/java
----
-{
-	franchise : p('ce-partner-franchise-id'),
-	client_secret : p('ce-partner-us-client-secret'),
-	client_id : p('ce-partner-us-client-id')
-}]]]></http:headers>
 		</http:request>
-		<flow-ref doc:name="exit-logger-flow" doc:id="5553a24f-9a96-4400-a939-94842d3b3412" name="exit-logger-flow"/>
-		<flow-ref doc:name="call-exit-audit-flow" doc:id="39253066-1c8e-481e-8a19-4736262feea6" name="call-exit-audit-flow"/>
-		<error-handler >
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5e617b46-d45d-4485-a652-2aca35fe46bb" >
-				<flow-ref doc:name="error-logger-flow" doc:id="fc03bd32-c551-4332-a707-d86a43b9dee7" name="error-logger-flow" />
-			</on-error-continue>
-		</error-handler>
+		<ee:transform doc:name="Response Payload" doc:id="57f35346-39c0-43a9-a813-55ebfc1303e8" >
+			<ee:message >
+				<ee:set-payload resource="Response_Payload.dwl" />
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable resource="httpStatus_200.dwl" variableName="httpStatus.UpdatePartner_Success" />
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="x-ce-partner-flow-common-exit-logging" doc:id="dfaf0541-977d-4b3b-be37-d037c953fe00" name="x-ce-partner-flow-common-exit-logging"/>
 	
-</flow>
+
+	</flow>
 	<flow name="x-ce-location-post-partners-flow">
-	<flow-ref doc:name="entry-logger-flow" doc:id="e9ba8e1a-1aee-4c78-99bc-9bf2c585eb05" name="entry-logger-flow"/>
-		<flow-ref doc:name="call-entry-audit-flow" doc:id="377e3167-a8dc-4677-963d-e76f138c2fe2" name="call-entry-audit-flow"/>
-		<http:request method="POST" doc:name="Post Partners" doc:id="6753328b-af01-4d36-8f1a-fbfaa2a26dee" config-ref="HTTP_Request_configuration_partners" path="${s-ce-partner-us-api.partners.path}">
+		
+			<flow-ref doc:name="x-ce-partner-flow-common-entry-logging" doc:id="a93a82ce-b0e2-425b-a08a-16b15d4e8152" name="x-ce-partner-flow-common-entry-logging"/>
+		<ee:transform doc:name="Check Franchise Header and Generate Trans_Id &amp; Request_Id" doc:id="f64ba88a-e147-4961-babc-b52b9c2fc195" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable resource="FranchiseId.dwl" variableName="franchise" />
+				<ee:set-variable resource="REQ_ID&amp;TRANS_ID.dwl" variableName="vRequestId" />
+				<ee:set-variable resource="REQ_ID&amp;TRANS_ID.dwl" variableName="vTransactionId" />
+			</ee:variables>
+		</ee:transform>
+		<validation:is-not-null doc:name="Franchise Not Null" doc:id="9eab3659-2c76-48bb-b47f-68251e33f219" value="#[vars.franchise]" message="Invalid franchise"/>
+		<ee:transform doc:name="Request_Payload" doc:id="a873b559-d023-4242-b278-065ee99c440d" >
+			<ee:message >
+				<ee:set-payload resource="Create_Partner_Request.dwl" />
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Create Partners" path="${s-ce-partner-us-api.partners.path}" config-ref="HTTP_Request_configuration_partners">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
-	franchise : p('ce-partner-franchise-id'),
-	client_secret : p('ce-partner-us-client-secret'),
-	client_id : p('ce-partner-us-client-id')
+	"X-COSTA-TRANSACTION-ID" : vars.TransactionId,
+	"X-COSTA-REQUEST-ID" : vars.RequestId
 }]]]></http:headers>
+			
 		</http:request>
-		<flow-ref doc:name="exit-logger-flow" doc:id="d0b5cb4c-5664-4b13-a5b3-7433e46ee4b8" name="exit-logger-flow"/>
-		<flow-ref doc:name="call-exit-audit-flow" doc:id="57f49214-0506-4333-a541-f7ea87fdda94" name="call-exit-audit-flow"/>
-		<error-handler >
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c2f68140-f809-4f4e-bfc3-8166d439b25a" >
-				<flow-ref doc:name="error-logger-flow" doc:id="c2860dd9-a8a3-4b45-8d88-d57a07810ab5" name="error-logger-flow"/>
-			</on-error-continue>
-		</error-handler>
+		<ee:transform doc:name="Response Payload" doc:id="0e121f30-7fd1-4ff0-b594-db62519299e4" >
+			<ee:message >
+				<ee:set-payload resource="Response_Payload.dwl" />
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable resource="httpStatus_201.dwl" variableName="httpStatus.CreatePartner_Success" />
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="x-ce-partner-flow-common-exit-logging" doc:id="668ace77-3189-4724-a738-c6ded1d01d13" name="x-ce-partner-flow-common-exit-logging"/>
+		
 	
-</flow>
+
+	</flow> 
 </mule>

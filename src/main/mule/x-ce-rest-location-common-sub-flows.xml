@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:crypto="http://www.mulesoft.org/schema/mule/crypto" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/crypto http://www.mulesoft.org/schema/mule/crypto/current/mule-crypto.xsd">
+     
+    <sub-flow name="x-ce-partner-flow-common-entry-logging" doc:id="a0026edf-f6ef-4f60-bc50-cdddc87e475c">
+    	<ee:transform doc:name="Logging Properties" doc:id="25aefeb4-06fc-4552-a6ba-e5d0efc4060a" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="vTimeStamp" ><![CDATA[now() as String {format: 'yyyy-MM-dd HH:mm:ss.SSS'}]]></ee:set-variable>
+				<ee:set-variable variableName="vLogEntryTimeStamp" ><![CDATA[now() as String {format: 'yyyy-MM-dd HH:mm:ss.SSS'}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="prepare-logging-attributes-sub-flow" doc:id="02ee376b-c4bc-4afa-8582-2b2ae29ae80f" name="prepare-logging-attributes-sub-flow"/>
+		<async doc:name="Async">
+			<flow-ref name="entry-logger-flow" doc:name="entry-logger-flow" />
+		</async>
+    </sub-flow>
+    
+    
+	<sub-flow name="x-ce-partner-flow-common-exit-logging" doc:id="67706710-207d-449b-885f-c7dc8256d655">
+
+		<ee:transform doc:name="Transform Message" doc:id="b4df3b66-ca43-439e-bc2a-9a835877765b" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="vTimeStamp" ><![CDATA[now() as String {format: 'yyyy-MM-dd HH:mm:ss.SSS'}]]></ee:set-variable>
+				<ee:set-variable variableName="vLogPayload" ><![CDATA[if(payload != null) payload else null]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref name="prepare-logging-attributes-sub-flow" doc:name="prepare-logging-attributes-sub-flow" />
+		<async doc:name="Async">
+			<flow-ref name="exit-logger-flow" doc:name="exit-logger-flow" />
+		</async>
+
+       
+    </sub-flow>
+    
+    <sub-flow name="x-ce-partner-flow-common-calling-logging" doc:id="64c0b04b-8777-4f48-9378-0b7b962730c6">
+
+		<ee:transform doc:name="Logging Properties" doc:id="2589af4d-3c73-4030-8516-290b5131f002" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="vLogCallingTimeStamp" ><![CDATA[now() as String {format: 'yyyy-MM-dd HH:mm:ss.SSS'}]]></ee:set-variable>
+				<ee:set-variable variableName="vTimeStamp" ><![CDATA[now() as String {format: 'yyyy-MM-dd HH:mm:ss.SSS'}]]></ee:set-variable>
+				<ee:set-variable variableName="vLogPayload" ><![CDATA[payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref name="prepare-logging-attributes-sub-flow" doc:name="prepare-logging-attributes-sub-flow" />
+		<async doc:name="Async">
+			<flow-ref name="call-entry-logger-flow" doc:name="call-entry-logger-flow" />
+		</async>
+    </sub-flow>
+    <sub-flow name="x-ce-partner-flow-common-called-logging" doc:id="918491eb-274b-4162-926d-f647738be7e2">
+
+		<ee:transform doc:name="Logging Properties" doc:id="fdc7f056-57ae-4ac4-8df0-d20b56a4abd3" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="vTimeStamp" ><![CDATA[now() as String {format: 'yyyy-MM-dd HH:mm:ss.SSS'}]]></ee:set-variable>
+				<ee:set-variable variableName="vLogPayload" ><![CDATA[payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref name="prepare-logging-attributes-sub-flow" doc:name="prepare-logging-attributes-sub-flow" />
+		<async doc:name="Async">
+			<flow-ref name="call-exit-logger-flow" doc:name="call-exit-logger-flow" />
+		</async>
+    
+    </sub-flow>
+    <sub-flow name="x-ce-partner-flow-common-processing-logging" doc:id="60db0158-b69d-4410-9ca6-169eb99e64fd">
+
+		<ee:transform doc:name="Logging Properties" doc:id="4a112423-ec18-4abe-acad-c87d47d00dfc" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="vTimeStamp" ><![CDATA[now() as String {format: 'yyyy-MM-dd HH:mm:ss.SSS'}]]></ee:set-variable>
+				<ee:set-variable variableName="vLogPayload" ><![CDATA[payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref name="prepare-logging-attributes-sub-flow" doc:name="prepare-logging-attributes-sub-flow" />
+		<async doc:name="Async">
+			<flow-ref name="process-logger-flow" doc:name="process-logger-flow" />
+		</async>
+    
+    </sub-flow>
+    <sub-flow name="x-ce-partner-flow-common-error-logging" doc:id="0581b97d-fc92-4b84-abd5-7b869dee2573">
+
+
+		<ee:transform doc:name="Transform Message" doc:id="82ca55b4-125b-48dd-b631-353e3d3932d7" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="vTimeStamp" ><![CDATA[now() as String {format: 'yyyy-MM-dd HH:mm:ss.SSS'}]]></ee:set-variable>
+				<ee:set-variable variableName="vPayload" ><![CDATA[payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref name="prepare-logging-attributes-sub-flow" doc:name="prepare-logging-attributes-sub-flow" />
+		<async doc:name="Async">
+			<flow-ref name="error-logger-flow" doc:name="error-logger-flow" />
+		</async>
+    </sub-flow>
+     <sub-flow name="prepare-logging-attributes-sub-flow" doc:id="18a4b4cc-1dee-4375-ae7b-3ea0d06aa805">
+		<ee:transform doc:name="Transform Message" doc:id="ed843236-90c3-4058-9e18-109a229548a0" >
+			<ee:variables>
+			<ee:set-variable variableName="attributes"><![CDATA[%dw 2.0
+output application/json
+var responseCode = if (attributes.headers.httpStatus != null) attributes.headers.httpStatus else vars.httpStatus
+---
+{
+	"Channel" : vars.vChannel,
+	"Organisation": vars.vOrganisation,
+	"Language": vars.vLanguage,
+	"ResponseCode": responseCode,
+	"Country": vars.vCountry	
+}]]></ee:set-variable>
+</ee:variables>
+		</ee:transform> 
+		
+	</sub-flow>
+</mule>

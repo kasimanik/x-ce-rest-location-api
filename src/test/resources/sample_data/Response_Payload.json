@@ -1,0 +1,24 @@
+%dw 2.0
+output application/json
+---
+{
+header: {
+count: payload.header.count,
+prev: payload.header.prev,
+next: payload.header.next
+},
+records: payload.records map {
+systemPartnerId: $.systemPartnerId,
+partnerReference: $.partnerReference,
+name: $.name,
+serviceAgent: $.serviceAgent,
+serviceAgentSource: $.serviceAgentSource,
+siteCount: $.siteCount,
+activeSiteCount: $.activeSiteCount,
+machineCount: $.machineCount,
+activeMachineCount: $.activeMachineCount,
+createdDateTime: $.createdDateTime,
+modCount: $.modCount,
+lastModifiedDateTime: $.lastModifiedDateTime,
+}
+}

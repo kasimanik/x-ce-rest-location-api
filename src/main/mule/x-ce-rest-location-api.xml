@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
     <http:listener-config name="x-ce-rest-location-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" />
     </http:listener-config>
     <apikit:config name="x-ce-rest-location-api-config" api="x-ce-rest-location-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <import doc:name="Import" doc:id="174b0257-44b6-43a3-8e23-da0db0874259" file="common-logging.xml" />
-	<import doc:name="Import" doc:id="ad4c595c-6d2e-4cbc-b545-8f3539312499" file="common-error-handling.xml" />
-	<import doc:name="Import" doc:id="d9cebc4b-ac62-4804-8c47-7d1232ee29be" file="common-auditing.xml" />
-	<flow name="x-ce-rest-location-api-main">
+    <flow name="x-ce-rest-location-api-main">
         <http:listener config-ref="x-ce-rest-location-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
@@ -17,87 +14,15 @@
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:router config-ref="x-ce-rest-location-api-config" />
-		<error-handler>
-            <on-error-propagate type="APIKIT:BAD_REQUEST">
-                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-                    <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Bad request"}]]></ee:set-payload>
-                    </ee:message>
-                    <ee:variables>
-                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
-                    </ee:variables>
-                </ee:transform>
-            </on-error-propagate>
-            <on-error-propagate type="APIKIT:NOT_FOUND">
-                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="79ff9089-978f-4999-9b7c-2ba3e37c5e74">
-                    <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Resource not found"}]]></ee:set-payload>
-                    </ee:message>
-                    <ee:variables>
-                        <ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
-                    </ee:variables>
-                </ee:transform>
-            </on-error-propagate>
-            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
-                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-                    <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Method not allowed"}]]></ee:set-payload>
-                    </ee:message>
-                    <ee:variables>
-                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
-                    </ee:variables>
-                </ee:transform>
-            </on-error-propagate>
-            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
-                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-                    <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Not acceptable"}]]></ee:set-payload>
-                    </ee:message>
-                    <ee:variables>
-                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
-                    </ee:variables>
-                </ee:transform>
-            </on-error-propagate>
-            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
-                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="69daef7b-f5a9-4da4-a7c6-e3d3f0a6966d">
-                    <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Unsupported media type"}]]></ee:set-payload>
-                    </ee:message>
-                    <ee:variables>
-                        <ee:set-variable variableName="httpStatus"><![CDATA[415]]></ee:set-variable>
-                    </ee:variables>
-                </ee:transform>
-            </on-error-propagate>
-            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
-                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-                    <ee:message>
-                        <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{message: "Not Implemented"}]]></ee:set-payload>
-                    </ee:message>
-                    <ee:variables>
-                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
-                    </ee:variables>
-                </ee:transform>
-            </on-error-propagate>
-        </error-handler>
+        <ee:transform doc:name="Transform Message" doc:id="4ec524f8-a7ac-4b25-940a-5d5c39373d66" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="vTransactionId" ><![CDATA[uuid() as String]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<apikit:router config-ref="x-ce-rest-location-api-config" />
+        <error-handler ref="apiKitGlobalExceptionMapping" />
     </flow>
     <flow name="x-ce-rest-location-api-console">
         <http:listener config-ref="x-ce-rest-location-api-httpListenerConfig" path="/console/*">
@@ -112,7 +37,7 @@ output application/json
         <apikit:console config-ref="x-ce-rest-location-api-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:NOT_FOUND">
-                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                <ee:transform xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="ed3dcf09-6fe7-4a71-b00e-511d1d2e8c57">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -120,22 +45,23 @@ output application/json
 {message: "Resource not found"}]]></ee:set-payload>
                     </ee:message>
                     <ee:variables>
-                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
                     </ee:variables>
                 </ee:transform>
             </on-error-propagate>
         </error-handler>
     </flow>
     <flow name="put:\partners:application\json:x-ce-rest-location-api-config">
-        <flow-ref doc:name="Flow Reference x-ce-location-put-partner-flow" doc:id="a86a10e8-752d-4754-b754-859dd438957e" name="x-ce-location-put-partner-flow"/>
+        <flow-ref doc:name="Flow Reference x-ce-location-put-partner-flow" doc:id="a86a10e8-752d-4754-b754-859dd438957e" name="x-ce-location-put-partner-flow" />
     </flow>
-	<flow name="get:\partners\(partnerReference):x-ce-rest-location-api-config">
-        <flow-ref doc:name="x-ce-partners-get-partners-partnerReference-flow" doc:id="ebebbfff-7887-4e83-8dca-ed58091ca097" name="x-ce-partners-get-partners-partnerReference-flow"/>
+    <flow name="get:\partners\(partnerReference):x-ce-rest-location-api-config">
+        <flow-ref doc:name="x-ce-partners-get-partners-partnerReference-flow" doc:id="ebebbfff-7887-4e83-8dca-ed58091ca097" name="x-ce-partners-get-partners-partnerReference-flow" />
     </flow>
     <flow name="get:\partners:x-ce-rest-location-api-config">
-        <flow-ref doc:name="Flow Reference x-ce-partners-get-partners-flow" doc:id="2e30ba76-0a3c-4e10-84ae-f4bb8622c271" name="x-ce-partners-get-partners-flow"/>
+        <flow-ref doc:name="Flow Reference x-ce-partners-get-partners-flow" doc:id="2e30ba76-0a3c-4e10-84ae-f4bb8622c271" name="x-ce-partners-get-partners-flow" />
+        <error-handler ref="x-ce-global-error-handlerError_Handler" />
     </flow>
     <flow name="post:\partners:application\json:x-ce-rest-location-api-config">
-		<flow-ref doc:name="Flow Reference x-ce-location-post-partners-flow" doc:id="529633e7-6c76-4491-b82b-a16b19d6aa72" name="x-ce-location-post-partners-flow"/>
+        <flow-ref doc:name="Flow Reference x-ce-location-post-partners-flow" doc:id="529633e7-6c76-4491-b82b-a16b19d6aa72" name="x-ce-location-post-partners-flow" />
     </flow>
 </mule>

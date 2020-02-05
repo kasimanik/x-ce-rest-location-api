@@ -7,16 +7,20 @@ documentation:
 version: 1.0
 
 uses:
-  partnerLibrary: library/library-partner.raml
+  partnerLibrary: library/partnerLibrary.raml
 
-/partner:
+traits:
+  clientidsecret: !include traits/clientidsecretTraits.raml
+  api-headers-required: !include traits/apiHeaderTraits.raml
+
+/partners:
   displayName: partners
   description: partners
-  securedBy: [partnerLibrary.basicAuth]
 
   get:
     displayName: Get partners
     description: Get partners
+    is: [clientidsecret, api-headers-required]
     queryParameters:
       _bookmark: 
         type: string
@@ -88,7 +92,7 @@ uses:
           application/json:
             type: partnerLibrary.ExceptionMessage
             examples: 
-              output: !include examples/ExceptionMessageExample.raml
+              output: !include examples/exceptionMessageExample.raml
 
   /{partnerReference}:
       uriParameters: 
@@ -98,6 +102,7 @@ uses:
       get:
         description: get partner by partnerReference
         displayName: get partner by partnerReference
+        is: [clientidsecret, api-headers-required]
 
         responses:
           200:
@@ -105,23 +110,25 @@ uses:
               application/json:
                 type: partnerLibrary.ExceptionMessage
                 examples: 
-                  output: !include examples/ExceptionMessageExample.raml
+                  output: !include examples/exceptionMessageExample.raml
           404:
             body:
               application/json:
                 type: partnerLibrary.ExceptionMessage
                 examples: 
-                  output: !include examples/ExceptionMessageExample.raml
+                  output: !include examples/exceptionMessageExample.raml
           500:
             body:
               application/json:
                 type: partnerLibrary.ExceptionMessage
                 examples: 
-                  output: !include examples/ExceptionMessageExample.raml
+                  output: !include examples/exceptionMessageExample.raml
 
   post:
     displayName: Create a partner
     description: Create a partner
+    is: [clientidsecret, api-headers-required]
+    
     body:
       application/json:
         type: partnerLibrary.CreatePartner
@@ -135,6 +142,8 @@ uses:
   put:
     displayName: Update a partner
     description: Update a partner
+    is: [clientidsecret, api-headers-required]
+
     body:
       application/json:
         type: partnerLibrary.UpdatePartner
